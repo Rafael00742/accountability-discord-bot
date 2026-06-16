@@ -1,3 +1,6 @@
+import json
+import discord
+
 message = """1. Prays
 2. Study
 3. Boxing"""
@@ -35,4 +38,17 @@ print("calling function")
 print("I reached the end of the file")
 print(result)
 
+#temporary test code
+with open ("data.json", "r") as file:
+   data = json.load(file)
 
+print(data)
+
+data["Rafael"] = {
+   "goals": ["Prays", "Study", "Boxing"],
+   "strikes": 0
+}
+print(data)
+
+with open ("data.json", "w") as file:
+   json.dump(data, file)
