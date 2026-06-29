@@ -1,54 +1,78 @@
 import json
+import os
 import discord
+from discord.ext import commands
+from dotenv import load_dotenv
 
-message = """1. Prays
-2. Study
-3. Boxing"""
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+# --- Your existing logic (cleaned up) ---
 
 def parse_daily_goals(message):
-    
     lines = message.splitlines()
-
     expected_number = 1
-    is_valid = True
     goals = []
 
     for line in lines:
-        
-        if line[0] == str(expected_number) and line[1] == ".":
-
-
-         parts = line.split(".")
-         goal =  parts[1].strip()
-
-         goals.append(goal)
-
-         expected_number += 1
-
+        line = line.strip()
+        if len(line) > 1 and line[0] == str(expected_number) and line[1] == ".":
+            parts = line.split(".", 1)
+            goal = parts[1].strip()
+            goals.append(goal)
+            expected_number += 1
         else:
-           is_valid = False
-           print("Invalid submission")
-           break
-        
+            print("Invalid format on line:", line)
+            return []
+
     return goals
 
-result = parse_daily_goals(message)
 
-print("calling function")  
-print("I reached the end of the file")
-print(result)
+def save_goals(username, goals):
+    username = username.lower()  # fix the Rafael vs rafael problem
 
-#temporary test code
-with open ("data.json", "r") as file:
-   data = json.load(file)
+    try:
+        with open("data.json", "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = {}
 
-print(data)
+    data[username] = {
+        "goals": goals,
+        "strikes": 0
+    }
 
-data["Rafael"] = {
-   "goals": ["Prays", "Study", "Boxing"],
-   "strikes": 0
-}
-print(data)
+    with open("data.json", "w") as file:
+        json.dump(data, file, indent=2)
 
-with open ("data.json", "w") as file:
-   json.dump(data, file)
+
+# --- Discord bot setup ---
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+
+@bot.event
+async def on_ready():
+    print(f"✅ {bot.user} is online and ready!")
+
+
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    
+    if message.content.startswith("1."):
+        goals = parse_daily_goals(message.content)
+        save_goals(message.author.name, goals)
+        await message.channel.send("Got your goals! ✅")
+    else:
+        await message.channel.send("Submission must start with 1.")
+    
+    await bot.process_commands(message)
+bot.run(TOKEN)
+
+

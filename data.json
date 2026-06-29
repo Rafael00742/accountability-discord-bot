@@ -1,1 +1,31 @@
-{"Rafael": {"goals": ["Prays", "Study", "Boxing"], "strikes": 0}}
+{
+  "Rafael": {
+    "goals": [
+      "Prays",
+      "Study",
+      "Boxing"
+    ],
+    "strikes": 0
+  },
+  "rafael": {
+    "goals": [
+      "prays",
+      "study",
+      "boxing"
+    ],
+    "strikes": 0
+  },
+  "John": {
+    "goals": [
+      "workout",
+      "read"
+    ],
+    "strikes": 0
+  },
+  "ralphtzu": {
+    "goals": [
+      "Boxing     2. Work on discord bot"
+    ],
+    "strikes": 0
+  }
+}
